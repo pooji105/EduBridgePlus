@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduBridge+ - Community</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1>EduBridge+</h1>
+            <p class="tagline">Learn. Act. Impact.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <h2>🌍 Community Impact</h2>
+            <p class="intro">Share your sustainability actions and inspire others! Every small step towards a better planet counts.</p>
+            
+            <!-- Post Form -->
+            <div class="post-form-section">
+                <h3>Share Your Action</h3>
+                <form id="post-form" class="community-form">
+                    <div class="form-group">
+                        <label for="username">Your Name:</label>
+                        <input type="text" id="username" name="username" placeholder="Enter your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="action">What did you do?</label>
+                        <textarea id="action" name="action" placeholder="Share your sustainability action (e.g., 'Planted 5 trees today 🌳' or 'Switched to reusable water bottles 💧')" required></textarea>
+                    </div>
+                    <button type="submit" class="btn primary-btn">Share Action</button>
+                </form>
+            </div>
+
+            <!-- Community Posts -->
+            <div class="posts-section">
+                <h3>Community Actions</h3>
+                <div id="posts-container" class="posts-container">
+                    {% if posts %}
+                        {% for post in posts %}
+                        <div class="post-card">
+                            <div class="post-header">
+                                <div class="post-user">
+                                    <span class="user-avatar">{{ post.username[0].upper() }}</span>
+                                    <span class="user-name">{{ post.username }}</span>
+                                </div>
+                                <span class="post-time">{{ post.created_at.strftime('%B %d, %Y') }}</span>
+                            </div>
+                            <div class="post-content">
+                                <p>{{ post.action }}</p>
+                            </div>
+                            <div class="post-actions">
+                                <button class="like-btn" onclick="likePost({{ post.id }})">
+                                    <span class="like-icon">👍</span>
+                                    <span class="like-count">{{ post.likes }}</span>
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="no-posts">
+                            <p>No posts yet. Be the first to share your sustainability action! 🌱</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="navigation">
+                <a href="/" class="btn">Back to Home</a>
+                <a href="/learn" class="btn">Continue Learning</a>
+                <a href="/dashboard" class="btn">View Dashboard</a>
+                <a href="/leaderboard" class="btn">Leaderboard</a>
+                <a href="/analytics" class="btn">Analytics</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Community posts functionality with database integration
+        
+        function likePost(postId) {
+            fetch(`/api/posts/${postId}/like`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update the like count in the UI
+                    const likeBtn = event.target.closest('.like-btn');
+                    const likeCount = likeBtn.querySelector('.like-count');
+                    likeCount.textContent = data.likes;
+                    
+                    // Add visual feedback
+                    likeBtn.style.transform = 'scale(1.1)';
+                    setTimeout(() => {
+                        likeBtn.style.transform = 'scale(1)';
+                    }, 200);
+                }
+            })
+            .catch(error => {
+                console.error('Error liking post:', error);
+            });
+        }
+        
+        function addPost(username, action) {
+            fetch('/api/posts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: username,
+                    action: action
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Reload the page to show the new post
+                    window.location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error adding post:', error);
+                alert('There was an error posting your action. Please try again.');
+            });
+        }
+        
+        // Form submission
+        document.getElementById('post-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const action = document.getElementById('action').value.trim();
+            
+            if (username && action) {
+                addPost(username, action);
+            } else {
+                alert('Please fill in both your name and action.');
+            }
+        });
+    </script>
+</body>
+</html>

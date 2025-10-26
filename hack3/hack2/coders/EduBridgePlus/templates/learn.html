@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduBridge+ - Learning Center</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1>EduBridge+</h1>
+            <p class="tagline">Learn. Act. Impact.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <h2>AI Learning Center</h2>
+            <p class="intro">Choose a sustainability topic to explore! Get AI explanations, videos, and eco tips aligned with SDG 4 (Quality Education), SDG 6 (Clean Water), and SDG 13 (Climate Action).</p>
+            
+            <!-- Voice Controls -->
+            <div class="voice-controls">
+                <h3>🎤 Voice Interaction</h3>
+                <div class="voice-buttons">
+                    <button id="voice-input-btn" class="voice-btn">🎤 Speak Topic</button>
+                    <button id="voice-output-btn" class="voice-btn">🔊 Read Aloud</button>
+                </div>
+                <div id="voice-status" class="voice-status"></div>
+            </div>
+
+            <!-- Topic Buttons Grid -->
+            <div class="topics-grid">
+                <a href="/learn?topic=Climate Change" class="topic-btn climate">🌍 Climate Change</a>
+                <a href="/learn?topic=Water Pollution" class="topic-btn water">💧 Water Pollution</a>
+                <a href="/learn?topic=Renewable Energy" class="topic-btn energy">⚡ Renewable Energy</a>
+                <a href="/learn?topic=Education" class="topic-btn education">📚 Education</a>
+                <a href="/learn?topic=Ocean Conservation" class="topic-btn ocean">🌊 Ocean Conservation</a>
+                <a href="/learn?topic=Carbon Footprint" class="topic-btn carbon">👣 Carbon Footprint</a>
+                <a href="/learn?topic=Solar Power" class="topic-btn solar">☀️ Solar Power</a>
+                <a href="/learn?topic=Wind Energy" class="topic-btn wind">💨 Wind Energy</a>
+                <a href="/learn?topic=Recycling" class="topic-btn recycling">♻️ Recycling</a>
+                <a href="/learn?topic=Sustainable Living" class="topic-btn sustainable">🌱 Sustainable Living</a>
+                <a href="/learn?topic=Green Technology" class="topic-btn technology">🔬 Green Technology</a>
+                <a href="/learn?topic=Environmental Protection" class="topic-btn protection">🛡️ Environmental Protection</a>
+            </div>
+
+            <!-- AI Output Display -->
+            {% if ai_output %}
+            <div class="ai-response">
+                <div class="response-content">
+                    {{ ai_output | safe }}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Action Plan Display -->
+            {% if action_plan %}
+            <div class="action-plan-section">
+                {{ action_plan | safe }}
+            </div>
+            {% endif %}
+
+            <!-- Quiz Section -->
+            {% if quiz_questions and quiz_questions|length > 0 %}
+            <div class="quiz-section">
+                <h3>🧠 Test Your Knowledge</h3>
+                <p class="quiz-description">Take this quick quiz to reinforce your learning about {{ topic }}. Select one answer for each question:</p>
+                
+                <form id="quiz-form">
+                    {% for question in quiz_questions %}
+                    {% set question_num = loop.index0 %}
+                    <div class="quiz-question">
+                        <h4>{{ loop.index }}. {{ question.question }}</h4>
+                        <div class="quiz-options">
+                            {% for option in question.options %}
+                            <label class="quiz-option">
+                                <input type="radio" name="question_{{ question_num }}" value="{{ loop.index0 }}">
+                                <span class="option-text">{{ option }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    <div class="quiz-submit">
+                        <button type="submit" class="btn primary-btn">Submit Quiz</button>
+                    </div>
+                </form>
+                
+                <div id="quiz-results" class="quiz-results" style="display: none;">
+                    <h4>Quiz Results</h4>
+                    <div class="score-display">
+                        <span id="score-text"></span>
+                        <div class="progress-bar">
+                            <div id="progress-fill" class="progress-fill"></div>
+                        </div>
+                    </div>
+                    <div id="quiz-feedback" class="quiz-feedback"></div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- YouTube Videos Section -->
+            {% if youtube_videos %}
+            <div class="videos-section">
+                <h3>📺 Related Videos</h3>
+                <p class="section-description">Watch these educational videos to learn more about {{ topic }}:</p>
+                <div class="video-grid">
+                    {% for video in youtube_videos %}
+                    <div class="video-card">
+                        <div class="video-thumbnail">
+                            <div class="play-button">▶</div>
+                        </div>
+                        <div class="video-info">
+                            <h4>{{ video.title }}</h4>
+                            <a href="{{ video.url }}" target="_blank" class="watch-btn">Watch Now</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Daily Eco Tip Section -->
+            {% if daily_tip %}
+            <div class="eco-tip-section">
+                <h3>🌱 Daily Eco Tip</h3>
+                <div class="tip-card">
+                    <div class="tip-content">
+                        {{ daily_tip }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="navigation">
+                <a href="/" class="btn">Back to Home</a>
+                <a href="/dashboard" class="btn">View Dashboard</a>
+                <a href="/community" class="btn">Community</a>
+                <a href="/leaderboard" class="btn">Leaderboard</a>
+                <a href="/analytics" class="btn">Analytics</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Voice Interaction functionality
+        let recognition;
+        let synthesis = window.speechSynthesis;
+        
+        // Initialize speech recognition
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+            
+            recognition.onstart = function() {
+                document.getElementById('voice-status').textContent = '🎤 Listening... Speak your topic now!';
+                document.getElementById('voice-input-btn').textContent = '🛑 Stop Listening';
+                document.getElementById('voice-input-btn').classList.add('listening');
+            };
+            
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript.toLowerCase().trim();
+                document.getElementById('voice-status').textContent = `🎤 Heard: "${transcript}"`;
+                
+                // Find matching topic button
+                const topicButtons = document.querySelectorAll('.topic-btn');
+                let matchedTopic = null;
+                
+                for (let btn of topicButtons) {
+                    const topicText = btn.textContent.toLowerCase();
+                    if (topicText.includes(transcript) || transcript.includes(topicText.split(' ')[1])) {
+                        matchedTopic = btn;
+                        break;
+                    }
+                }
+                
+                if (matchedTopic) {
+                    document.getElementById('voice-status').textContent += ` → Redirecting to ${matchedTopic.textContent}`;
+                    setTimeout(() => {
+                        window.location.href = matchedTopic.href;
+                    }, 1000);
+                } else {
+                    document.getElementById('voice-status').textContent += ' → No matching topic found. Try saying "Climate Change", "Water Pollution", etc.';
+                }
+            };
+            
+            recognition.onerror = function(event) {
+                document.getElementById('voice-status').textContent = `❌ Error: ${event.error}`;
+                document.getElementById('voice-input-btn').textContent = '🎤 Speak Topic';
+                document.getElementById('voice-input-btn').classList.remove('listening');
+            };
+            
+            recognition.onend = function() {
+                document.getElementById('voice-input-btn').textContent = '🎤 Speak Topic';
+                document.getElementById('voice-input-btn').classList.remove('listening');
+            };
+        }
+        
+        // Voice input button
+        document.getElementById('voice-input-btn').addEventListener('click', function() {
+            if (recognition) {
+                if (this.classList.contains('listening')) {
+                    recognition.stop();
+                } else {
+                    recognition.start();
+                }
+            } else {
+                document.getElementById('voice-status').textContent = '❌ Speech recognition not supported in this browser';
+            }
+        });
+        
+        // Voice output button
+        document.getElementById('voice-output-btn').addEventListener('click', function() {
+            const aiResponse = document.querySelector('.response-content');
+            if (aiResponse) {
+                const text = aiResponse.innerText;
+                if (text) {
+                    // Stop any ongoing speech
+                    synthesis.cancel();
+                    
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.rate = 0.8;
+                    utterance.pitch = 1;
+                    utterance.volume = 0.8;
+                    
+                    utterance.onstart = function() {
+                        document.getElementById('voice-status').textContent = '🔊 Reading AI explanation...';
+                        document.getElementById('voice-output-btn').textContent = '⏸️ Pause';
+                    };
+                    
+                    utterance.onend = function() {
+                        document.getElementById('voice-status').textContent = '✅ Finished reading';
+                        document.getElementById('voice-output-btn').textContent = '🔊 Read Aloud';
+                    };
+                    
+                    utterance.onerror = function(event) {
+                        document.getElementById('voice-status').textContent = `❌ Speech error: ${event.error}`;
+                        document.getElementById('voice-output-btn').textContent = '🔊 Read Aloud';
+                    };
+                    
+                    synthesis.speak(utterance);
+                } else {
+                    document.getElementById('voice-status').textContent = '❌ No content to read. Please select a topic first.';
+                }
+            } else {
+                document.getElementById('voice-status').textContent = '❌ No AI explanation available. Please select a topic first.';
+            }
+        });
+        
+        // Quiz functionality
+        document.getElementById('quiz-form')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const answers = [];
+            const questions = {{ quiz_questions | default([]) | tojson | safe }};
+            
+            // Validate that all questions are answered
+            let allAnswered = true;
+            const unansweredQuestions = [];
+            
+            for (let i = 0; i < questions.length; i++) {
+                const answer = formData.get(`question_${i}`);
+                if (answer === null || answer === undefined) {
+                    allAnswered = false;
+                    unansweredQuestions.push(i + 1);
+                }
+                answers.push(answer ? parseInt(answer) : -1);
+            }
+            
+            // If not all questions are answered, show specific error
+            if (!allAnswered) {
+                const questionText = unansweredQuestions.length === 1 ? 'question' : 'questions';
+                alert(`Please answer ${questionText} ${unansweredQuestions.join(', ')} before submitting.`);
+                return;
+            }
+            
+            // Disable submit button to prevent double submission
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+            
+            // Submit to backend
+            fetch('/submit_quiz', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    answers: answers,
+                    questions: questions,
+                    topic: '{{ topic }}'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Show results
+                document.getElementById('quiz-results').style.display = 'block';
+                document.getElementById('score-text').textContent = 
+                    `You scored ${data.score}/${data.total} (${data.percentage}%)`;
+                
+                // Update progress bar
+                const progressFill = document.getElementById('progress-fill');
+                progressFill.style.width = `${data.percentage}%`;
+                
+                // Show feedback
+                let feedback = '';
+                if (data.percentage >= 80) {
+                    feedback = '🎉 Excellent! You have a great understanding of this topic!';
+                } else if (data.percentage >= 60) {
+                    feedback = '👍 Good job! Keep learning to improve your knowledge.';
+                } else {
+                    feedback = '📚 Keep studying! Review the material and try again.';
+                }
+                document.getElementById('quiz-feedback').textContent = feedback;
+                
+                // Scroll to results
+                document.getElementById('quiz-results').scrollIntoView({ behavior: 'smooth' });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('There was an error submitting your quiz. Please try again.');
+            })
+            .finally(() => {
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Quiz';
+            });
+        });
+    </script>
+</body>
+</html>

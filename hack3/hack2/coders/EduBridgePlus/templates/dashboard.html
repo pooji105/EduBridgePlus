@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduBridge+ - SDG Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1>EduBridge+</h1>
+            <p class="tagline">Learn. Act. Impact.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <h2>📊 Your SDG Learning Dashboard</h2>
+            <p class="intro">Track your progress across Sustainable Development Goals 4, 6, and 13. See how your learning journey is making an impact!</p>
+            
+            <!-- Progress Overview -->
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-icon">📚</div>
+                    <div class="stat-content">
+                        <h3>{{ progress.topics_learned }}</h3>
+                        <p>Topics Learned</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🧠</div>
+                    <div class="stat-content">
+                        <h3>{{ progress.quizzes_completed }}</h3>
+                        <p>Quizzes Completed</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⭐</div>
+                    <div class="stat-content">
+                        <h3>{{ progress.total_score }}</h3>
+                        <p>Total Score</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🏆</div>
+                    <div class="stat-content">
+                        <h3>{{ progress.badges|length }}</h3>
+                        <p>Badges Earned</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SDG Progress Chart -->
+            <div class="chart-section">
+                <h3>🎯 SDG Learning Progress</h3>
+                <div class="chart-container">
+                    <canvas id="sdgChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Badges Section -->
+            <div class="badges-section">
+                <h3>🏆 Your Achievements</h3>
+                <div class="badges-grid">
+                    <div class="badge-card {% if progress.topics_learned >= 3 %}earned{% endif %}">
+                        <div class="badge-icon">🌱</div>
+                        <h4>Eco Starter</h4>
+                        <p>Learn 3 topics</p>
+                        <div class="badge-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: {{ [progress.topics_learned / 3 * 100, 100] | min }}%"></div>
+                            </div>
+                            <span>{{ progress.topics_learned }}/3</span>
+                        </div>
+                    </div>
+                    
+                    <div class="badge-card {% if progress.topics_learned >= 5 %}earned{% endif %}">
+                        <div class="badge-icon">💧</div>
+                        <h4>Water Warrior</h4>
+                        <p>Learn 5 topics</p>
+                        <div class="badge-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: {{ [progress.topics_learned / 5 * 100, 100] | min }}%"></div>
+                            </div>
+                            <span>{{ progress.topics_learned }}/5</span>
+                        </div>
+                    </div>
+                    
+                    <div class="badge-card {% if progress.topics_learned >= 10 %}earned{% endif %}">
+                        <div class="badge-icon">🌞</div>
+                        <h4>Climate Champion</h4>
+                        <p>Learn 10 topics</p>
+                        <div class="badge-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: {{ [progress.topics_learned / 10 * 100, 100] | min }}%"></div>
+                            </div>
+                            <span>{{ progress.topics_learned }}/10</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SDG Breakdown -->
+            <div class="sdg-breakdown">
+                <h3>📈 SDG Breakdown</h3>
+                <div class="sdg-cards">
+                    <div class="sdg-card sdg-4">
+                        <div class="sdg-icon">📚</div>
+                        <div class="sdg-content">
+                            <h4>SDG 4: Quality Education</h4>
+                            <p>{{ progress.sdg_4_topics }} topics learned</p>
+                            <div class="sdg-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: {{ (progress.sdg_4_topics / progress.topics_learned * 100) if progress.topics_learned > 0 else 0 }}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sdg-card sdg-6">
+                        <div class="sdg-icon">💧</div>
+                        <div class="sdg-content">
+                            <h4>SDG 6: Clean Water</h4>
+                            <p>{{ progress.sdg_6_topics }} topics learned</p>
+                            <div class="sdg-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: {{ (progress.sdg_6_topics / progress.topics_learned * 100) if progress.topics_learned > 0 else 0 }}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sdg-card sdg-13">
+                        <div class="sdg-icon">🌍</div>
+                        <div class="sdg-content">
+                            <h4>SDG 13: Climate Action</h4>
+                            <p>{{ progress.sdg_13_topics }} topics learned</p>
+                            <div class="sdg-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: {{ (progress.sdg_13_topics / progress.topics_learned * 100) if progress.topics_learned > 0 else 0 }}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="navigation">
+                <a href="/" class="btn">Back to Home</a>
+                <a href="/learn" class="btn">Continue Learning</a>
+                <a href="/community" class="btn">Community</a>
+                <a href="/leaderboard" class="btn">Leaderboard</a>
+                <a href="/analytics" class="btn">Analytics</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize SDG Chart
+        const ctx = document.getElementById('sdgChart').getContext('2d');
+        const sdgChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['SDG 4: Education', 'SDG 6: Water', 'SDG 13: Climate'],
+                datasets: [{
+                    data: [{{ progress.sdg_4_topics }}, {{ progress.sdg_6_topics }}, {{ progress.sdg_13_topics }}],
+                    backgroundColor: [
+                        '#4CAF50',
+                        '#2196F3',
+                        '#FF9800'
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            font: {
+                                size: 14
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + context.parsed + ' topics';
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    animateRotate: true,
+                    duration: 2000
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+{
+  "name": "EduBridge+ - AI Learning Platform",
+  "short_name": "EduBridge+",
+  "description": "AI-powered learning platform for sustainability aligned with SDG 4, 6, and 13",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#e8f5e8",
+  "theme_color": "#4caf50",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMjQiIGZpbGw9InVybCgjZ3JhZGllbnQwX2xpbmVhcl8xXzEpIi8+CjxwYXRoIGQ9Ik05NiA0OEM3Ny45MDg2IDQ4IDY0IDYxLjkwODYgNjQgODBWMTQ0QzY0IDE2Mi4wOTEgNzcuOTA4NiAxNzYgOTYgMTc2QzExNC4wOTEgMTc2IDEyOCAxNjIuMDkxIDEyOCAxNDRWODBDMTI4IDYxLjkwODYgMTE0LjA5MSA0OCA5NiA0OFoiIGZpbGw9IndoaXRlIiBmaWxsLW9wYWNpdHk9IjAuOSIvPgo8cGF0aCBkPSJNODggNzJIMTA0VjEyMEg4OFY3MloiIGZpbGw9IiM0Q0FGNTAiLz4KPHA+PC9wYXRoPgo8cGF0aCBkPSJNODggOTZIMTA0VjEyMEg4OFY5NloiIGZpbGw9IiMyMTk2RjMiLz4KPHA+PC9wYXRoPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJncmFkaWVudDBfbGluZWFyXzFfMSIgeDE9IjAiIHkxPSIwIiB4Mj0iMTkyIiB5Mj0iMTkyIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiM0Q0FGNTIiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMjE5NkYzIi8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "sustainability", "productivity"],
+  "lang": "en",
+  "dir": "ltr",
+  "scope": "/",
+  "prefer_related_applications": false
+}
